@@ -32,13 +32,24 @@
   // Return an array of the first n elements of an array. If n is undefined,
   // return just the first element.
   _.first = function(array, n) {
-    return n === undefined ? array[0] : array.slice(0, n);
+    if (n === undefined) {
+      return array[0];
+    } else {
+      return array.slice(0,n)
+    }
+ //ternary   return n === undefined ? array[0] : array.slice(0, n);
   };
 
   // Like first, but for the last elements. If n is undefined, return just the
   // last element.
   _.last = function(array, n) {
-   return n === undefined ? array[array.length - 1] : array.slice(Math.max(0, array.length-n))
+    if (n === undefined) {
+      return array[array.length-1];
+    } else {
+      array.slice(Math.max(0, array.length-n));
+    }
+
+//ternary   return n === undefined ? array[array.length - 1] : array.slice(Math.max(0, array.length-n))
   };
 
   // Call iterator(value, key, collection) for each element of collection.
@@ -159,19 +170,24 @@
   //   }); // should be 5, regardless of the iterator function passed in
   //          No accumulator is given so the first element is used.
   _.reduce = function(collection, iterator, accumulator) {
-    var initializing = arguments.length === 2;
 
-    _.each(collection, function(val) {
-      if (initializing) {
-        initializing = false;
-        accumulator = val;
-      } else {
-        accumulator = iterator(accumulator, val);
-      }
-    });
+   var initializing = arguments.length === 2;
 
-    return accumulator;
-  };
+   _.each(collection, function(val) {
+     if (initializing) {
+       initializing = false;
+       accumulator = val;
+     } else {
+       accumulator = iterator(accumulator, val);
+     }
+   }); 
+   return accumulator;
+   } 
+  // function Sum(a,b) {
+  //   return a+b;
+  // }
+  // var array = [0,2,5];
+
 
   // Determine if the array or object contains a given value (using `===`).
   _.contains = function(collection, target) {
@@ -238,9 +254,11 @@
   // Like extend, but doesn't ever overwrite a key that already
   // exists in obj
   _.defaults = function(obj) {
-    _.each(Array.prototype.slice.call(arguments, 1), function(object) {
-      _.each(object, function(prop, key) {
-        obj[key] === undefined && (obj[key] = prop);
+    _.each(Array.prototype.slice.call(arguments).slice(1), function(object){
+      _.each(object, function(prop, key){
+        if(!obj.hasOwnProperty(key)) {
+          obj[key] = prop;
+        }
       });
     });
 
@@ -351,6 +369,15 @@
   // of that string. For example, _.sortBy(people, 'name') should sort
   // an array of people by their name.
   _.sortBy = function(collection, iterator) {
+    var results = [];
+    _.each(collection, function(item, key){
+      if (item.iterator > collection[0]) {
+        results.pop(item);
+      } else {
+        results.push(item);
+      }
+    return results;
+    })
   };
 
   // Zip together two or more arrays with elements of the same index
@@ -358,7 +385,17 @@
   //
   // Example:
   // _.zip(['a','b','c','d'], [1,2,3]) returns [['a',1], ['b',2], ['c',3], ['d',undefined]]
-  _.zip = function() {
+  _.zip = function(args) {
+    var result = [];
+    _.each(args, function(arrays){
+      _.each(arrays, function(value, index){
+        if (result[index] === undefined) {
+          result[index] = [];
+        }
+        result[index].push(value);
+      });
+    });
+    return result;
   };
 
   // Takes a multidimensional array and converts it to a one-dimensional array.
@@ -366,6 +403,17 @@
   //
   // Hint: Use Array.isArray to check if something is an array
   _.flatten = function(nestedArray, result) {
+    var output = result || [];
+    if(Array.isArray(nestedArray)) {
+      _.each(nestedArray, function(item){
+        if(Array.isArray(nestedArray[item])) {
+          output = output.concat(_.flatten(nestedArray[item]));
+        } else {
+          output.push(nestedArray[item]);
+        }
+      });
+    }
+    return output;
   };
 
   // Takes an arbitrary number of arrays and produces an array that contains
